@@ -1,11 +1,5 @@
 {
   "buildCommand": "echo 'Static site'",
-  "outputDirectory": ".",
-  "rewrites": [
-    {
-      "source": "/api/tmdb/:path*",
-      "destination": "/api/tmdb.js"
-    }
-  ]
+  "outputDirectory": "."
 }
 
