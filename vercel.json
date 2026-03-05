@@ -1,0 +1,10 @@
+{
+  "buildCommand": "echo 'Static site - no build needed'",
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/api/tmdb/(.*)",
+      "destination": "/api/[...path]?path=$1"
+    }
+  ]
+}
