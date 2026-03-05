@@ -1,9 +1,21 @@
 class MovieApp {
     constructor() {
         this.apiKey = '3fd2be6f0c70a2a598f084ddfb75487c';
-        // Use reliable CORS proxy
+        // Detect environment
+        const isVercel = window.location.hostname.includes('vercel.app');
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        if (isVercel) {
+            // On Vercel: use serverless function
+            this.baseUrl = '/api/movies';
+        } else {
+            // Locally: use CORS proxy
+            this.baseUrl = 'https://api.themoviedb.org/3';
+            this.corsProxy = 'https://corsproxy.io/?';
+        }
+        
+        this.isVercel = isVercel;
         this.tmdbBaseUrl = 'https://api.themoviedb.org/3';
-        this.corsProxy = 'https://api.allorigins.win/raw?url=';
         this.imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
         this.moviesGrid = document.getElementById('moviesGrid');
         this.searchInput = document.getElementById('searchInput');
@@ -34,10 +46,16 @@ class MovieApp {
         this.init();
     }
 
-    // Helper method to construct CORS-proxied URLs
+    // Helper method to construct proxied URLs
     proxyUrl(endpoint) {
-        const fullUrl = `${this.tmdbBaseUrl}${endpoint}`;
-        return `${this.corsProxy}${encodeURIComponent(fullUrl)}`;
+        if (this.isVercel) {
+            // On Vercel: use serverless function
+            return `${this.baseUrl}${endpoint}`;
+        } else {
+            // Locally: use CORS proxy
+            const fullUrl = `${this.tmdbBaseUrl}${endpoint}`;
+            return `${this.corsProxy}${fullUrl}`;
+        }
     }
 
     init() {
