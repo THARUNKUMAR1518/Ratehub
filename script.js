@@ -3,11 +3,17 @@ class MovieApp {
         this.apiKey = '3fd2be6f0c70a2a598f084ddfb75487c';
         this.tmdbBaseUrl = 'https://api.themoviedb.org/3';
         this.imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
-        // Detect environment
+        
+        // Detect if we're on Vercel
         const isVercel = window.location.hostname.includes('vercel.app');
         this.isVercel = isVercel;
-        // On Vercel use serverless, locally use direct CORS
-        this.proxyBase = isVercel ? '/api/fetch?url=' : 'https://api.allorigins.win/raw?url=';
+        
+        // Set proxy based on environment
+        if (isVercel) {
+            this.proxyBase = '/api/fetch?url=';
+        } else {
+            this.proxyBase = 'https://corsproxy.io/?';
+        }
         this.moviesGrid = document.getElementById('moviesGrid');
         this.searchInput = document.getElementById('searchInput');
         this.searchBtn = document.getElementById('searchBtn');
@@ -37,10 +43,10 @@ class MovieApp {
         this.init();
     }
 
-    // Helper method to construct proxied URLs
+    // Helper method to construct URLs
     proxyUrl(endpoint) {
         const fullUrl = `${this.tmdbBaseUrl}${endpoint}`;
-        return `${this.proxyBase}${encodeURIComponent(fullUrl)}`;
+        return `${this.proxyBase}${fullUrl}`;
     }
 
     init() {
