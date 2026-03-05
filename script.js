@@ -1,22 +1,13 @@
 class MovieApp {
     constructor() {
         this.apiKey = '3fd2be6f0c70a2a598f084ddfb75487c';
-        // Detect environment
-        const isVercel = window.location.hostname.includes('vercel.app');
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        
-        if (isVercel) {
-            // On Vercel: use serverless function
-            this.baseUrl = '/api/movies';
-        } else {
-            // Locally: use CORS proxy
-            this.baseUrl = 'https://api.themoviedb.org/3';
-            this.corsProxy = 'https://corsproxy.io/?';
-        }
-        
-        this.isVercel = isVercel;
         this.tmdbBaseUrl = 'https://api.themoviedb.org/3';
         this.imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
+        // Detect environment
+        const isVercel = window.location.hostname.includes('vercel.app');
+        this.isVercel = isVercel;
+        // On Vercel use serverless, locally use direct CORS
+        this.proxyBase = isVercel ? '/api/fetch?url=' : 'https://api.allorigins.win/raw?url=';
         this.moviesGrid = document.getElementById('moviesGrid');
         this.searchInput = document.getElementById('searchInput');
         this.searchBtn = document.getElementById('searchBtn');
@@ -48,15 +39,8 @@ class MovieApp {
 
     // Helper method to construct proxied URLs
     proxyUrl(endpoint) {
-        if (this.isVercel) {
-            // On Vercel: /api/movies/... catch-all route
-            // endpoint is like: /genre/movie/list?api_key=...&language=en-US
-            return `/api/movies${endpoint}`;
-        } else {
-            // Locally: use CORS proxy
-            const fullUrl = `${this.tmdbBaseUrl}${endpoint}`;
-            return `${this.corsProxy}${fullUrl}`;
-        }
+        const fullUrl = `${this.tmdbBaseUrl}${endpoint}`;
+        return `${this.proxyBase}${encodeURIComponent(fullUrl)}`;
     }
 
     init() {
